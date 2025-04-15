@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Golf Wind Adjustment Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label, select, input {
+      display: block;
+      margin: 10px 0;
+      width: 100%;
+      padding: 8px;
+      font-size: 1em;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Golf Wind Adjustment Calculator</h2>
+
+    <label for="windSpeed">Wind Speed (MPH):</label>
+    <input type="number" id="windSpeed" placeholder="e.g., 10" />
+
+    <label for="direction">Wind Direction:</label>
+    <select id="direction">
+      <option value="Headwind">Headwind</option>
+      <option value="Tailwind">Tailwind</option>
+      <option value="Crosswind - Standard">Crosswind - Standard</option>
+      <option value="Crosswind - In to draw">Crosswind - In to draw</option>
+    </select>
+
+    <label for="shotType">Shot Type:</label>
+    <select id="shotType">
+      <option value="Full">Full</option>
+      <option value="Partial <100yds">Partial &lt;100yds</option>
+      <option value="Spinner">Spinner</option>
+    </select>
+
+    <label for="elevation">Elevation Change (ft):</label>
+    <input type="number" id="elevation" placeholder="e.g., 10" />
+
+    <label for="elevationDirection">Elevation Direction:</label>
+    <select id="elevationDirection">
+      <option value="Up">Up</option>
+      <option value="Down">Down</option>
+    </select>
+
+    <button onclick="calculateAdjustment()">Calculate Adjustment</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function calculateAdjustment() {
+      const windSpeed = parseFloat(document.getElementById("windSpeed").value);
+      const direction = document.getElementById("direction").value;
+      const shotType = document.getElementById("shotType").value;
+      const elevationFeet = parseFloat(document.getElementById("elevation").value) || 0;
+      const elevationDirection = document.getElementById("elevationDirection").value;
+
+      let adjustment = 0;
+
+      if (shotType === "Spinner") {
+        adjustment = 0;
+      } else if (direction === "Headwind") {
+        adjustment = shotType === "Partial <100yds" ? windSpeed * 1.16 : windSpeed * 1.4;
+      } else if (direction === "Tailwind") {
+        adjustment = -windSpeed * 0.79;
+      } else if (direction === "Crosswind - Standard") {
+        adjustment = windSpeed;
+      } else if (direction === "Crosswind - In to draw") {
+        adjustment = windSpeed * 1.2;
+      }
+
+      const elevationYards = elevationFeet / 3;
+      const elevationAdj = elevationDirection === "Up" ? elevationYards : -elevationYards;
+      const total = adjustment + elevationAdj;
+
+      if (direction.includes("Crosswind")) {
+        document.getElementById("result").innerText =
+          `Aim: ${adjustment.toFixed(2)} yards left or right (one line on green)
+` +
+          `Elevation Adjustment: ${elevationAdj.toFixed(2)} yards`;
+      } else {
+        document.getElementById("result").innerText = `Adjustment: ${total.toFixed(2)} yards to target`;
+      }
+    }
+  </script>
+</body>
+</html>
